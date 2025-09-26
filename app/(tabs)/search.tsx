@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
+
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 
 import MovieCard from "@/components/movieCard";
 import SearchBar from "@/components/searchBar";
-import { icons } from "@/constants/icons";
-import { images } from "@/constants/images";
 import { fetchMovies } from "@/services/api";
+import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
-    data: movies,
+    data: movies = [],
     loading,
     error,
     refetch: loadMovies,
@@ -22,6 +24,24 @@ const Search = () => {
   const handleSearch = (text: string) => {
     setSearchQuery(text);
   };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (searchQuery.trim()) {
+        await loadMovies();
+
+        // Call updateSearchCount only if there are results
+        if (movies?.length! > 0 && movies?.[0]) {
+          await updateSearchCount(searchQuery, movies[0]);
+        }
+      } else {
+        reset();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   return (
     <View className="flex-1 bg-primary">
@@ -33,7 +53,7 @@ const Search = () => {
 
       <FlatList
         className="px-5"
-        data={movies}
+        data={movies as Movie[]}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <MovieCard {...item} />}
         numColumns={3}
