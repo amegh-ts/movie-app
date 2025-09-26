@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
-
-import { icons } from "@/constants/icons";
-import { images } from "@/constants/images";
-
+/* eslint-disable react-hooks/exhaustive-deps */
 import MovieCard from "@/components/movieCard";
 import SearchBar from "@/components/searchBar";
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 import { fetchMovies } from "@/services/api";
 import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
